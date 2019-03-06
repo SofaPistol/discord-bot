@@ -1,0 +1,5 @@
+{
+	"prefix": "!",
+	"discord_token": "discord-token-goes-here",
+	"omdb_key": "omdb-api-key-goes-here"
+}
