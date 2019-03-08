@@ -51,25 +51,33 @@ client.on('message', message => {
 				rich_embed.addField('Genre:', omdb_data.Genre);
 
 				// show slightly different information based on type
-				if (omdb_data.Type === 'movie') {
-					rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
-					.addField('Director:', omdb_data.Director, true)
-					.addField('Writer:', omdb_data.Writer, true);
-				} else if (omdb_data.Type === 'series') {
-					rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
-					.addField('Seasons:', omdb_data.totalSeasons, true)
-					.addField('Runtime:', omdb_data.Runtime, true);
-				} else {
-					// episode entry
-					rich_embed.setTitle(omdb_data.Title + ' (Episode, 	'+omdb_data.Year+')')
-					.addField('Director:', omdb_data.Director, true)
-					.addField('Writer:', omdb_data.Writer, true);
+				switch(omdb_data.Type) {
+					case 'movie':
+						rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
+						.addField('Director:', omdb_data.Director, true)
+						.addField('Writer:', omdb_data.Writer, true);
+						break;
+					case 'series':
+						rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
+						.addField('Seasons:', omdb_data.totalSeasons, true)
+						.addField('Runtime:', omdb_data.Runtime, true);
+						break;
+					case 'episode':
+						rich_embed.setTitle(omdb_data.Title + ' (Episode, '+omdb_data.Year+')')
+						.addField('Director:', omdb_data.Director, true)
+						.addField('Writer:', omdb_data.Writer, true);
+						break;
+					default:
+						// game
+						rich_embed.setTitle(omdb_data.Title + ' (Game, '+omdb_data.Year+')')
+						.addField('Director:', omdb_data.Director, true)
+						.addField('Writer:', omdb_data.Writer, true);
 				}
 
 				rich_embed.setURL(`https://www.imdb.com/title/${id}/`)
 				.addField('Actors:', omdb_data.Actors)
 				.addField('Plot:', omdb_data.Plot)
-				.setColor(0x1d86cf);
+				.setColor(0x4A4A4A);
 
 				// omdb json may or may not have any of the three ratings
 				let imdb_score = 'N/A', rt_score = 'N/A', meta_score = 'N/A';
@@ -86,7 +94,7 @@ client.on('message', message => {
 						'IMDb: ' + imdb_score + ' (' + omdb_data.imdbVotes +
 						' Votes)\u00A0\u00A0\u00A0\u00A0RT: ' + rt_score +
 						'\u00A0\u00A0\u00A0\u00A0Meta: ' + meta_score);
-				} else rich_embed.addField('Ratings:', 'N/A');
+				}
 
 				// send response to channel
 				message.channel.send(rich_embed).catch(console.error);
@@ -100,7 +108,7 @@ client.on('message', message => {
 			.setTitle('Available Bot Commands')
 			.setColor(0x0c82c8)
 			.addField(`${prefix}h / ${prefix}help`, 'lists available bot commands')
-			.addField(`${prefix}i / ${prefix}imdb ARGUMENT`, 'fetches IMDb entry');
+			.addField(`${prefix}i / ${prefix}imdb ARGUMENT`, 'displays IMDb entry');
 		message.channel.send(rich_embed).catch(console.error);
 	}
 });
