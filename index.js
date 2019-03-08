@@ -36,27 +36,47 @@ client.on('message', message => {
 				if (error || response.statusCode != 200) return message.channel.send('http error').catch(console.error);
 
 				const omdb_data = JSON.parse(body);
-				if (omdb_data.Response === 'False') return;
+				if (omdb_data.Response === 'False') return message.channel.send('omdb error').catch(console.error);
 
 				// populate discord's richEmbed object
-				const rich_embed = new discord.RichEmbed()
-					.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
-					.setURL(`https://www.imdb.com/title/${id}/`)
-					.setColor(0x0c82c8)
-					.addField('Genre:', omdb_data.Genre)
-					.addField('Director:', omdb_data.Director, true)
-					.addField('Writer:', omdb_data.Writer, true)
-					.addField('Actors:', omdb_data.Actors)
-					.addField('Plot:', omdb_data.Plot);
+				const rich_embed = new discord.RichEmbed();
+				const cur_date = new Date();
+                                const rls_date = new Date(omdb_data.Released);
+
+				// show release date when it hasn't been released yet
+				if (cur_date < rls_date) rich_embed.addField("Release:", omdb_data.Released);
 
 				if (omdb_data.Poster !== 'N/A') rich_embed.setThumbnail(omdb_data.Poster);
+
+				rich_embed.addField('Genre:', omdb_data.Genre);
+
+				// show slightly different information based on type
+				if (omdb_data.Type === 'movie') {
+					rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
+					.addField('Director:', omdb_data.Director, true)
+					.addField('Writer:', omdb_data.Writer, true);
+				} else if (omdb_data.Type === 'series') {
+					rich_embed.setTitle(omdb_data.Title + ' ('+omdb_data.Year+')')
+					.addField('Seasons:', omdb_data.totalSeasons, true)
+					.addField('Runtime:', omdb_data.Runtime, true);
+				} else {
+					// episode entry
+					rich_embed.setTitle(omdb_data.Title + ' (Episode, 	'+omdb_data.Year+')')
+					.addField('Director:', omdb_data.Director, true)
+					.addField('Writer:', omdb_data.Writer, true);
+				}
+
+				rich_embed.setURL(`https://www.imdb.com/title/${id}/`)
+				.addField('Actors:', omdb_data.Actors)
+				.addField('Plot:', omdb_data.Plot)
+				.setColor(0x1d86cf);
 
 				// omdb json may or may not have any of the three ratings
 				let imdb_score = 'N/A', rt_score = 'N/A', meta_score = 'N/A';
 				if (omdb_data.Ratings.length) {
 					imdb_score = omdb_data.imdbRating + '/10';
 
-					omdb_data.Ratings.forEach(function(item){
+					omdb_data.Ratings.forEach(function(item) {
 						if (item.Source === 'Rotten Tomatoes') rt_score = item.Value;
 						else if (item.Source === 'Metacritic') meta_score = item.Value;
 					});
