@@ -2,7 +2,13 @@ const discord = require('discord.js');
 const request = require('request');
 const { prefix, discord_token, omdb_key } = require('./config.json');
 
+
 const client = new discord.Client();
+
+client.on('error', () => {
+	// catch to prevent bot from crashing on disconnects
+	console.log('discord client error');
+});
 
 client.once('ready', () => {
 	console.log('Ready!');
@@ -40,10 +46,10 @@ client.on('message', message => {
 
 				// populate discord's richEmbed object
 				const rich_embed = new discord.RichEmbed();
-				const cur_date = new Date();
-                                const rls_date = new Date(omdb_data.Released);
 
 				// show release date when it hasn't been released yet
+				const cur_date = new Date();
+                                const rls_date = new Date(omdb_data.Released);
 				if (cur_date < rls_date) rich_embed.addField("Release:", omdb_data.Released);
 
 				if (omdb_data.Poster !== 'N/A') rich_embed.setThumbnail(omdb_data.Poster);
@@ -106,7 +112,7 @@ client.on('message', message => {
 	else if (cmd === 'h' || cmd === 'help') {
 		const rich_embed = new discord.RichEmbed()
 			.setTitle('Available Bot Commands')
-			.setColor(0x0c82c8)
+			.setColor(0x4A4A4A)
 			.addField(`${prefix}h / ${prefix}help`, 'lists available bot commands')
 			.addField(`${prefix}i / ${prefix}imdb ARGUMENT`, 'displays IMDb entry');
 		message.channel.send(rich_embed).catch(console.error);
