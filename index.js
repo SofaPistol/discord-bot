@@ -2,7 +2,6 @@ const discord = require('discord.js');
 const request = require('request');
 const { prefix, discord_token, omdb_key } = require('./config.json');
 
-
 const client = new discord.Client();
 
 client.on('error', () => {
@@ -19,8 +18,8 @@ client.on('message', message => {
 
 	// split user input in command and argument part, multiple arguments are not considered for now
 	const pos_sep = message.content.indexOf(' ');
-	const cmd = (pos_sep != -1) ? message.content.substr(prefix.length, pos_sep - 1).toLowerCase() : message.content.substr(prefix.length).toLowerCase();
-	const arg = (pos_sep != -1) ? message.content.substr(pos_sep + 1) : '';
+	const cmd = (~pos_sep) ? message.content.substr(prefix.length, pos_sep - 1).toLowerCase() : message.content.substr(prefix.length).toLowerCase();
+	const arg = (~pos_sep) ? message.content.substr(pos_sep + 1) : '';
 
 	// command for imdb lookup
 	if (cmd === 'i' || cmd === 'imdb') {
